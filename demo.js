@@ -65,10 +65,10 @@ function onBuyClicked() {
   };
 
   const options = {
-    requestShipping: true,
-    requestPayerName: true,
-    requestPayerPhone: true,
-    requestPayerEmail: true,
+    requestShipping: false,
+    requestPayerName: false,
+    requestPayerPhone: false,
+    requestPayerEmail: false,
     shippingType: 'shipping',
   };
 
