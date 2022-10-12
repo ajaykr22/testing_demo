@@ -84,44 +84,44 @@ function onBuyClicked() {
     console.log('Payment Request Error: ' + e.message);
     return;
   }
-  if (!request) {
-    console.log('Web payments are not supported in this browser.');
-    return;
-  }
+  // if (!request) {
+  //   console.log('Web payments are not supported in this browser.');
+  //   return;
+  // }
 
-  request.addEventListener('shippingaddresschange', function(evt) {
-    evt.updateWith(new Promise(function(resolve) {
+  request.addEventListener('shippingaddresschange', function (evt) {
+    evt.updateWith(new Promise(function (resolve) {
       fetch('/ship', {
         method: 'POST',
-        headers: new Headers({'Content-Type': 'application/json'}),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: addressToJsonString(request.shippingAddress),
         credentials: 'include',
       })
-          .then(function(options) {
-            if (options.ok) {
-              return options.json();
-            }
+        .then(function (options) {
+          if (options.ok) {
+            return options.json();
+          }
+          console.log('Unable to calculate shipping options.');
+        })
+        .then(function (optionsJson) {
+          if (optionsJson.status === 'success') {
+            updateShipping(details, optionsJson.shippingOptions, resolve);
+          } else {
             console.log('Unable to calculate shipping options.');
-          })
-          .then(function(optionsJson) {
-            if (optionsJson.status === 'success') {
-              updateShipping(details, optionsJson.shippingOptions, resolve);
-            } else {
-              console.log('Unable to calculate shipping options.');
-            }
-          })
-          .catch(function(err) {
-            console.log('Unable to calculate shipping options. ' + err);
-          });
+          }
+        })
+        .catch(function (err) {
+          console.log('Unable to calculate shipping options. ' + err);
+        });
     }));
   });
 
-  request.addEventListener('shippingoptionchange', function(evt) {
-    evt.updateWith(new Promise(function(resolve) {
+  request.addEventListener('shippingoptionchange', function (evt) {
+    evt.updateWith(new Promise(function (resolve) {
       for (let i in details.shippingOptions) {
         if ({}.hasOwnProperty.call(details.shippingOptions, i)) {
           details.shippingOptions[i].selected =
-              (details.shippingOptions[i].id === request.shippingOption);
+            (details.shippingOptions[i].id === request.shippingOption);
         }
       }
 
@@ -131,12 +131,12 @@ function onBuyClicked() {
 
   var canMakePaymentPromise = checkCanMakePayment(request);
   canMakePaymentPromise
-      .then((result) => {
-        showPaymentUI(request, result);
-      })
-      .catch((err) => {
-        console.log('Error calling checkCanMakePayment: ' + err);
-      });
+    .then((result) => {
+      showPaymentUI(request, result);
+    })
+    .catch((err) => {
+      console.log('Error calling checkCanMakePayment: ' + err);
+    });
 }
 
 /**
@@ -166,14 +166,14 @@ function checkCanMakePayment(request) {
   }
 
   return canMakePaymentPromise
-      .then((result) => {
-        // Store the result in cache for future usage.
-        sessionStorage[canMakePaymentCache] = result;
-        return result;
-      })
-      .catch((err) => {
-        console.log('Error calling canMakePayment: ' + err);
-      });
+    .then((result) => {
+      // Store the result in cache for future usage.
+      sessionStorage[canMakePaymentCache] = result;
+      return result;
+    })
+    .catch((err) => {
+      console.log('Error calling canMakePayment: ' + err);
+    });
 }
 
 /**
@@ -185,31 +185,31 @@ function checkCanMakePayment(request) {
  */
 function showPaymentUI(request, canMakePayment) {
   // Redirect to play store if can't make payment.
-  if (!canMakePayment) {
-    redirectToPlayStore();
-    return;
-  }
+  // if (!canMakePayment) {
+  //   redirectToPlayStore();
+  //   return;
+  // }
 
   // Set payment timeout.
-  let paymentTimeout = window.setTimeout(function() {
+  let paymentTimeout = window.setTimeout(function () {
     window.clearTimeout(paymentTimeout);
     request.abort()
-        .then(function() {
-          console.log('Payment timed out after 20 minutes.');
-        })
-        .catch(function() {
-          console.log('Unable to abort, user is in the process of paying.');
-        });
+      .then(function () {
+        console.log('Payment timed out after 20 minutes.');
+      })
+      .catch(function () {
+        console.log('Unable to abort, user is in the process of paying.');
+      });
   }, 20 * 60 * 1000); /* 20 minutes */
 
-  request.show()
-      .then(function(instrument) {
-        window.clearTimeout(paymentTimeout);
-        processResponse(instrument);  // Handle response from browser.
-      })
-      .catch(function(err) {
-        console.log(err);
-      });
+  // request.show()
+  //   .then(function (instrument) {
+  //     window.clearTimeout(paymentTimeout);
+  //     processResponse(instrument);  // Handle response from browser.
+  //   })
+  //   .catch(function (err) {
+  //     console.log(err);
+  //   });
 }
 
 /**
@@ -224,23 +224,23 @@ function processResponse(instrument) {
 
   fetch('/buy', {
     method: 'POST',
-    headers: new Headers({'Content-Type': 'application/json'}),
+    headers: new Headers({ 'Content-Type': 'application/json' }),
     body: instrumentString,
     credentials: 'include',
   })
-      .then(function(buyResult) {
-        if (buyResult.ok) {
-          return buyResult.json();
-        }
-        console.log('Error sending instrument to server.');
-      })
-      .then(function(buyResultJson) {
-        completePayment(
-            instrument, buyResultJson.status, buyResultJson.message);
-      })
-      .catch(function(err) {
-        console.log('Unable to process payment. ' + err);
-      });
+    .then(function (buyResult) {
+      if (buyResult.ok) {
+        return buyResult.json();
+      }
+      console.log('Error sending instrument to server.');
+    })
+    .then(function (buyResultJson) {
+      completePayment(
+        instrument, buyResultJson.status, buyResultJson.message);
+    })
+    .catch(function (err) {
+      console.log('Unable to process payment. ' + err);
+    });
 }
 
 /**
@@ -254,26 +254,26 @@ function processResponse(instrument) {
  */
 function completePayment(instrument, result, msg) {
   instrument.complete(result)
-      .then(function() {
-        console.log('Payment completes.');
-        console.log(msg);
-        document.getElementById('inputSection').style.display = 'none'
-        document.getElementById('outputSection').style.display = 'block'
-        document.getElementById('response').innerHTML =
-            JSON.stringify(instrument, undefined, 2);
-      })
-      .catch(function(err) {
-        console.log(err);
-      });
+    .then(function () {
+      console.log('Payment completes.');
+      console.log(msg);
+      document.getElementById('inputSection').style.display = 'none'
+      document.getElementById('outputSection').style.display = 'block'
+      document.getElementById('response').innerHTML =
+        JSON.stringify(instrument, undefined, 2);
+    })
+    .catch(function (err) {
+      console.log(err);
+    });
 }
 
 /** Redirect to PlayStore. */
-function redirectToPlayStore() {
-  if (confirm('Tez not installed, go to play store and install?')) {
-    window.location.href =
-        'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
-  };
-}
+// function redirectToPlayStore() {
+//   if (confirm('Tez not installed, go to play store and install?')) {
+//     window.location.href =
+//       'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
+//   };
+// }
 
 /**
  * Converts the shipping address into a JSON string.
@@ -345,7 +345,7 @@ function updateShipping(details, shippingOptions, callback) {
   details.total.amount.value = total.toFixed(2);
   if (selectedShippingOption) {
     details.displayItems.splice(
-        1, details.displayItems.length == 1 ? 0 : 1, selectedShippingOption);
+      1, details.displayItems.length == 1 ? 0 : 1, selectedShippingOption);
   }
 
   callback(details);
