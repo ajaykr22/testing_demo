@@ -6,12 +6,12 @@ const canMakePaymentCache = 'canMakePaymentCache';
  */
 function readSupportedInstruments() {
   let formValue = {};
-  formValue['pa'] = document.getElementById('pa').value;
-  formValue['pn'] = document.getElementById('pn').value;
-  formValue['tn'] = document.getElementById('tn').value;
-  formValue['mc'] = document.getElementById('mc').value;
+  formValue['pa'] = document.getElementById('pa').value;//merchantId
+  formValue['pn'] = document.getElementById('pn').value;//
+  formValue['tn'] = document.getElementById('tn').value;//message
+  formValue['mc'] = document.getElementById('mc').value;//merchantUserId
   formValue['tr'] = document.getElementById('tr').value;
-  formValue['tid'] = document.getElementById('tid').value;
+  formValue['tid'] = document.getElementById('tid').value;//transactionId
   formValue['url'] = document.getElementById('url').value;
   return formValue;
 }
@@ -65,10 +65,15 @@ function onBuyClicked() {
   };
 
   const options = {
-    requestShipping: false,
-    requestPayerName: false,
-    requestPayerPhone: false,
-    requestPayerEmail: false,
+    // requestShipping: false,
+    // requestPayerName: false,
+    // requestPayerPhone: false,
+    // requestPayerEmail: false,
+    // shippingType: 'shipping',
+    requestShipping: true,
+    requestPayerName: true,
+    requestPayerPhone: true,
+    requestPayerEmail: true,
     shippingType: 'shipping',
   };
 
