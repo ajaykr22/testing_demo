@@ -101,7 +101,7 @@ function onBuyClicked() {
           .then(function(optionsJson) {
             if (optionsJson.status === 'success') {
               updateShipping(details, optionsJson.shippingOptions, resolve);
-              return optionsJson;
+              // return optionsJson;
             } else {
               console.log('Unable to calculate shipping options.');
             }
