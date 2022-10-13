@@ -130,7 +130,7 @@ function onBuyClicked() {
         showPaymentUI(request, result);
       })
       .catch((err) => {
-        // console.log('Error calling checkCanMakePayment: ' + err);
+        console.log('Error calling checkCanMakePayment: ' + err);
       });
 }
 
@@ -263,12 +263,12 @@ function completePayment(instrument, result, msg) {
 }
 
 /** Redirect to PlayStore. */
-// function redirectToPlayStore() {
-//   if (confirm('Tez not installed, go to play store and install?')) {
-//     window.location.href =
-//         'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
-//   };
-// }
+function redirectToPlayStore() {
+  if (confirm('Tez not installed, go to play store and install?')) {
+    window.location.href =
+        'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
+  };
+}
 
 /**
  * Converts the shipping address into a JSON string.
