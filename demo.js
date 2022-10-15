@@ -84,46 +84,46 @@ function onBuyClicked() {
     return;
   }
 
-  request.addEventListener('shippingaddresschange', function(evt) {
-    evt.updateWith(new Promise(function(resolve) {
-      fetch('/ship', {
-        method: 'POST',
-        headers: new Headers({'Content-Type': 'application/json'}),
-        body: addressToJsonString(request.shippingAddress),
-        credentials: 'include',
-      })
-          .then(function(options) {
-            if (options.ok) {
-              return options.json();
-            }
-            console.log('Unable to calculate shipping options.');
-          })
-          .then(function(optionsJson) {
-            if (optionsJson.status === 'success') {
-              updateShipping(details, optionsJson.shippingOptions, resolve);
-              // return 'This is success part.....';
-            } else {
-              console.log('Unable to calculate shipping options.');
-            }
-          })
-          .catch(function(err) {
-            console.log('Unable to calculate shipping options. ' + err);
-          });
-    }));
-  });
+  // request.addEventListener('shippingaddresschange', function(evt) {
+  //   evt.updateWith(new Promise(function(resolve) {
+  //     fetch('/ship', {
+  //       method: 'POST',
+  //       headers: new Headers({'Content-Type': 'application/json'}),
+  //       body: addressToJsonString(request.shippingAddress),
+  //       credentials: 'include',
+  //     })
+  //         .then(function(options) {
+  //           if (options.ok) {
+  //             return options.json();
+  //           }
+  //           console.log('Unable to calculate shipping options.');
+  //         })
+  //         .then(function(optionsJson) {
+  //           if (optionsJson.status === 'success') {
+  //             updateShipping(details, optionsJson.shippingOptions, resolve);
+  //             // return 'This is success part.....';
+  //           } else {
+  //             console.log('Unable to calculate shipping options.');
+  //           }
+  //         })
+  //         .catch(function(err) {
+  //           console.log('Unable to calculate shipping options. ' + err);
+  //         });
+  //   }));
+  // });
 
-  request.addEventListener('shippingoptionchange', function(evt) {
-    evt.updateWith(new Promise(function(resolve) {
-      for (let i in details.shippingOptions) {
-        if ({}.hasOwnProperty.call(details.shippingOptions, i)) {
-          details.shippingOptions[i].selected =
-              (details.shippingOptions[i].id === request.shippingOption);
-        }
-      }
+  // request.addEventListener('shippingoptionchange', function(evt) {
+  //   evt.updateWith(new Promise(function(resolve) {
+  //     for (let i in details.shippingOptions) {
+  //       if ({}.hasOwnProperty.call(details.shippingOptions, i)) {
+  //         details.shippingOptions[i].selected =
+  //             (details.shippingOptions[i].id === request.shippingOption);
+  //       }
+  //     }
 
-      updateShipping(details, details.shippingOptions, resolve);
-    }));
-  });
+  //     updateShipping(details, details.shippingOptions, resolve);
+  //   }));
+  // });
 
   var canMakePaymentPromise = checkCanMakePayment(request);
   canMakePaymentPromise
@@ -131,7 +131,7 @@ function onBuyClicked() {
         showPaymentUI(request, result);
       })
       .catch((err) => {
-        // console.log('Error calling checkCanMakePayment: ' + err);
+        console.log('Error calling checkCanMakePayment: ' + err);
       });
 }
 
@@ -264,12 +264,12 @@ function completePayment(instrument, result, msg) {
 }
 
 /** Redirect to PlayStore. */
-// function redirectToPlayStore() {
-//   if (confirm('Tez not installed, go to play store and install?')) {
-//     window.location.href =
-//         'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
-//   };
-// }
+function redirectToPlayStore() {
+  if (confirm('Tez not installed, go to play store and install?')) {
+    window.location.href =
+        'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user.alpha'
+  };
+}
 
 /**
  * Converts the shipping address into a JSON string.
@@ -278,21 +278,21 @@ function completePayment(instrument, result, msg) {
  * @param {PaymentAddress} address The address to convert.
  * @return {string} The string representation of the address.
  */
-function addressToJsonString(address) {
-  var addressDictionary = address.toJSON ? address.toJSON() : {
-    recipient: address.recipient,
-    organization: address.organization,
-    addressLine: address.addressLine,
-    dependentLocality: address.dependentLocality,
-    city: address.city,
-    region: address.region,
-    postalCode: address.postalCode,
-    sortingCode: address.sortingCode,
-    country: address.country,
-    phone: address.phone,
-  };
-  return JSON.stringify(addressDictionary, undefined, 2);
-}
+// function addressToJsonString(address) {
+//   var addressDictionary = address.toJSON ? address.toJSON() : {
+//     recipient: address.recipient,
+//     organization: address.organization,
+//     addressLine: address.addressLine,
+//     dependentLocality: address.dependentLocality,
+//     city: address.city,
+//     region: address.region,
+//     postalCode: address.postalCode,
+//     sortingCode: address.sortingCode,
+//     country: address.country,
+//     phone: address.phone,
+//   };
+//   return JSON.stringify(addressDictionary, undefined, 2);
+// }
 
 /**
  * Converts the payment instrument into a JSON string.
@@ -323,26 +323,26 @@ function instrumentToJsonString(instrument) {
  * @param {Array} shippingOptions The shipping options.
  * @param {function} callback The callback to invoke.
  */
-function updateShipping(details, shippingOptions, callback) {
-  let selectedShippingOption;
-  for (let i in shippingOptions) {
-    if (shippingOptions[i].selected) {
-      selectedShippingOption = shippingOptions[i];
-    }
-  }
+// function updateShipping(details, shippingOptions, callback) {
+//   let selectedShippingOption;
+//   for (let i in shippingOptions) {
+//     if (shippingOptions[i].selected) {
+//       selectedShippingOption = shippingOptions[i];
+//     }
+//   }
 
-  var total = parseFloat(readAmount());
-  if (selectedShippingOption) {
-    let shippingPrice = Number(selectedShippingOption.amount.value);
-    total = total + shippingPrice;
-  }
+//   var total = parseFloat(readAmount());
+//   if (selectedShippingOption) {
+//     let shippingPrice = Number(selectedShippingOption.amount.value);
+//     total = total + shippingPrice;
+//   }
 
-  details.shippingOptions = shippingOptions;
-  details.total.amount.value = total.toFixed(2);
-  if (selectedShippingOption) {
-    details.displayItems.splice(
-        1, details.displayItems.length == 1 ? 0 : 1, selectedShippingOption);
-  }
+//   details.shippingOptions = shippingOptions;
+//   details.total.amount.value = total.toFixed(2);
+//   if (selectedShippingOption) {
+//     details.displayItems.splice(
+//         1, details.displayItems.length == 1 ? 0 : 1, selectedShippingOption);
+//   }
 
-  callback(details);
-}
+//   callback(details);
+// }
