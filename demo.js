@@ -1,9 +1,5 @@
-// Global key for canMakepayment cache.
 const canMakePaymentCache = 'canMakePaymentCache';
 
-/**
- * Read data for supported instruments from input from.
- */
 function readSupportedInstruments() {
   let formValue = {};
   formValue['pa'] = document.getElementById('pa').value;//merchantId
@@ -16,16 +12,10 @@ function readSupportedInstruments() {
   return formValue;
 }
 
-/**
- * Read the amount from input form.
- */
 function readAmount() {
   return document.getElementById('amount').value;
 }
 
-/**
- * Launches payment request.
- */
 function onBuyClicked() {
   if (!window.PaymentRequest) {
     console.log('Web payments are not supported in this browser.');
@@ -84,47 +74,6 @@ function onBuyClicked() {
     return;
   }
 
-  // request.addEventListener('shippingaddresschange', function(evt) {
-  //   evt.updateWith(new Promise(function(resolve) {
-  //     fetch('/ship', {
-  //       method: 'POST',
-  //       headers: new Headers({'Content-Type': 'application/json'}),
-  //       body: addressToJsonString(request.shippingAddress),
-  //       credentials: 'include',
-  //     })
-  //         .then(function(options) {
-  //           if (options.ok) {
-  //             return options.json();
-  //           }
-  //           console.log('Unable to calculate shipping options.');
-  //         })
-  //         .then(function(optionsJson) {
-  //           if (optionsJson.status === 'success') {
-  //             updateShipping(details, optionsJson.shippingOptions, resolve);
-  //             // return 'This is success part.....';
-  //           } else {
-  //             console.log('Unable to calculate shipping options.');
-  //           }
-  //         })
-  //         .catch(function(err) {
-  //           console.log('Unable to calculate shipping options. ' + err);
-  //         });
-  //   }));
-  // });
-
-  // request.addEventListener('shippingoptionchange', function(evt) {
-  //   evt.updateWith(new Promise(function(resolve) {
-  //     for (let i in details.shippingOptions) {
-  //       if ({}.hasOwnProperty.call(details.shippingOptions, i)) {
-  //         details.shippingOptions[i].selected =
-  //             (details.shippingOptions[i].id === request.shippingOption);
-  //       }
-  //     }
-
-  //     updateShipping(details, details.shippingOptions, resolve);
-  //   }));
-  // });
-
   var canMakePaymentPromise = checkCanMakePayment(request);
   canMakePaymentPromise
       .then((result) => {
@@ -135,35 +84,20 @@ function onBuyClicked() {
       });
 }
 
-/**
- * Checks whether can make a payment with Tez on this device. It checks the
- * session storage cache first and uses the cached information if it exists.
- * Otherwise, it calls canMakePayment method from the Payment Request object and
- * returns the result. The result is also stored in the session storage cache
- * for future use.
- *
- * @private
- * @param {PaymentRequest} request The payment request object.
- * @return {Promise} a promise containing the result of whether can make payment.
- */
+
 function checkCanMakePayment(request) {
-  // Checks canMakePayment cache, and use the cache result if it exists.
   if (sessionStorage.hasOwnProperty(canMakePaymentCache)) {
     return Promise.resolve(JSON.parse(sessionStorage[canMakePaymentCache]));
   }
 
-  // If canMakePayment() isn't available, default to assuming that the method is
-  // supported.
   var canMakePaymentPromise = Promise.resolve(true);
 
-  // Feature detect canMakePayment().
   if (request.canMakePayment) {
     canMakePaymentPromise = request.canMakePayment();
   }
 
   return canMakePaymentPromise
       .then((result) => {
-        // Store the result in cache for future usage.
         sessionStorage[canMakePaymentCache] = result;
         return result;
       })
@@ -172,21 +106,12 @@ function checkCanMakePayment(request) {
       });
 }
 
-/**
- * Show the payment request UI.
- *
- * @private
- * @param {PaymentRequest} request The payment request object.
- * @param {Promise} canMakePayment The promise for whether can make payment.
- */
 function showPaymentUI(request, canMakePayment) {
-  // Redirect to play store if can't make payment.
   if (!canMakePayment) {
     redirectToPlayStore();
     return;
   }
 
-  // Set payment timeout.
   let paymentTimeout = window.setTimeout(function() {
     window.clearTimeout(paymentTimeout);
     request.abort()
@@ -208,12 +133,6 @@ function showPaymentUI(request, canMakePayment) {
       });
 }
 
-/**
- * Process the response from browser.
- *
- * @private
- * @param {PaymentResponse} instrument The payment instrument that was authed.
- */
 function processResponse(instrument) {
   var instrumentString = instrumentToJsonString(instrument);
   console.log(instrumentString);
@@ -239,15 +158,6 @@ function processResponse(instrument) {
       });
 }
 
-/**
- * Notify browser that the instrument authorization has completed.
- *
- * @private
- * @param {PaymentResponse} instrument The payment instrument that was authed.
- * @param {string} result Whether the auth was successful. Should be either
- * 'success' or 'fail'.
- * @param {string} msg The message to log in console.
- */
 function completePayment(instrument, result, msg) {
   instrument.complete(result)
       .then(function() {
@@ -263,7 +173,6 @@ function completePayment(instrument, result, msg) {
       });
 }
 
-/** Redirect to PlayStore. */
 function redirectToPlayStore() {
   if (confirm('Tez not installed, go to play store and install?')) {
     window.location.href =
@@ -271,38 +180,7 @@ function redirectToPlayStore() {
   };
 }
 
-/**
- * Converts the shipping address into a JSON string.
- *
- * @private
- * @param {PaymentAddress} address The address to convert.
- * @return {string} The string representation of the address.
- */
-// function addressToJsonString(address) {
-//   var addressDictionary = address.toJSON ? address.toJSON() : {
-//     recipient: address.recipient,
-//     organization: address.organization,
-//     addressLine: address.addressLine,
-//     dependentLocality: address.dependentLocality,
-//     city: address.city,
-//     region: address.region,
-//     postalCode: address.postalCode,
-//     sortingCode: address.sortingCode,
-//     country: address.country,
-//     phone: address.phone,
-//   };
-//   return JSON.stringify(addressDictionary, undefined, 2);
-// }
-
-/**
- * Converts the payment instrument into a JSON string.
- *
- * @private
- * @param {PaymentResponse} instrument The instrument to convert.
- * @return {string} The string representation of the instrument.
- */
 function instrumentToJsonString(instrument) {
-  // PaymentResponse is an interface, JSON.stringify works only on dictionaries.
   var instrumentDictionary = {
     methodName: instrument.methodName,
     details: instrument.details,
@@ -314,35 +192,3 @@ function instrumentToJsonString(instrument) {
   };
   return JSON.stringify(instrumentDictionary, undefined, 2);
 }
-
-/**
- * Update order details with shipping information.
- *
- * @private
- * @param {PaymentDetails} details The details for payment.
- * @param {Array} shippingOptions The shipping options.
- * @param {function} callback The callback to invoke.
- */
-// function updateShipping(details, shippingOptions, callback) {
-//   let selectedShippingOption;
-//   for (let i in shippingOptions) {
-//     if (shippingOptions[i].selected) {
-//       selectedShippingOption = shippingOptions[i];
-//     }
-//   }
-
-//   var total = parseFloat(readAmount());
-//   if (selectedShippingOption) {
-//     let shippingPrice = Number(selectedShippingOption.amount.value);
-//     total = total + shippingPrice;
-//   }
-
-//   details.shippingOptions = shippingOptions;
-//   details.total.amount.value = total.toFixed(2);
-//   if (selectedShippingOption) {
-//     details.displayItems.splice(
-//         1, details.displayItems.length == 1 ? 0 : 1, selectedShippingOption);
-//   }
-
-//   callback(details);
-// }
