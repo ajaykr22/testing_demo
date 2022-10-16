@@ -34,7 +34,6 @@ function onBuyClicked() {
       data: formValue,
     },
   ];
-
   const details = {
     total: {
       label: 'Total',
