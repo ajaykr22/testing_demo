@@ -53,17 +53,10 @@ function onBuyClicked() {
     ],
   };
 
-  const options = {
-    requestShipping: false,
-    requestPayerName: false,
-    requestPayerPhone: false,
-    requestPayerEmail: false,
-    shippingType: 'shipping',
-  };
 
   let request = null;
   try {
-    request = new PaymentRequest(supportedInstruments, details, options);
+    request = new PaymentRequest(supportedInstruments, details);
   } catch (e) {
     console.log('Payment Request Error: ' + e.message);
     return;
